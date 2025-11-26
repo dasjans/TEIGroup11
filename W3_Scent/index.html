@@ -563,6 +563,14 @@
       // Game data (EDIT THIS PART)
       // ----------------------------
       // Replace these with your real scent pairs and jar numbers.
+      //
+      // All pairs are within categories, so to add a pair to a category,
+      // find the appropriate category object and add a new pair object to its
+      // "pairs" array.
+      //
+      // To create a new category, copy an existing category object and change
+      // its "id", "name", "description", and "pairs" values.
+
       const gameData = {
         categories: [
           {
