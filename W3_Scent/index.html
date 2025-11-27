@@ -67,7 +67,6 @@
       overflow: hidden;
     }
 
-    /* Small "chip" style header for score */
     .score-card {
       position: absolute;
       top: 14px;
@@ -81,6 +80,7 @@
       box-shadow: 0 10px 20px rgba(0,0,0,0.45);
       border: 3px solid #b45309;
       transform: rotate(1.5deg);
+      z-index: 2;
     }
 
     .score-chip {
@@ -115,6 +115,7 @@
       gap: 10px;
       color: #fefce8;
       text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+      z-index: 2;
     }
 
     .table-title-icon {
@@ -146,7 +147,6 @@
       opacity: 0.9;
     }
 
-    /* Card layout area */
     .table-inner {
       position: absolute;
       inset: 70px 20px 18px 20px;
@@ -188,6 +188,7 @@
       background:
         radial-gradient(circle at top left, #fef3c7, transparent 55%),
         var(--card-bg);
+      position: relative;
     }
 
     .card-side {
@@ -198,6 +199,7 @@
         radial-gradient(circle at bottom right, #e0f2fe, transparent 55%),
         var(--card-bg);
       border-color: #38bdf8;
+      transition: height 0.2s ease, padding 0.2s ease;
     }
 
     .card-header-label {
@@ -220,12 +222,44 @@
       font-size: 1.2rem;
     }
 
-    /* Category row styled as cards */
+    /* Player round mini-card */
+    .player-round-card {
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 14px;
+      background: #ecfdf5;
+      border: 2px solid #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 0.9rem;
+    }
+
+    .player-round-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #047857;
+    }
+
+    .player-round-names {
+      font-weight: 700;
+      color: #065f46;
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .player-round-names span {
+      white-space: nowrap;
+    }
+
     .categories {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin: 2px 0 6px;
+      margin: 4px 0 6px;
     }
 
     .category-btn {
@@ -344,7 +378,6 @@
       margin-top: 4px;
     }
 
-    /* Timer as a card inset */
     .timer-block {
       margin-top: 10px;
       padding: 10px 10px;
@@ -497,7 +530,6 @@
       margin-top: 4px;
     }
 
-    /* Side card: rules */
     .side-panel-section {
       margin-bottom: 10px;
     }
@@ -556,11 +588,140 @@
       padding: 2px 4px;
       border-radius: 4px;
     }
+
+    .card-side-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .rules-toggle-btn {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      background: #e0f2fe;
+      border: 2px solid rgba(59,130,246,0.9);
+      color: #1d4ed8;
+      font-weight: 600;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    .rules-toggle-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .card-side.collapsed {
+      padding-bottom: 10px;
+    }
+
+    .card-side.collapsed .side-content {
+      display: none;
+    }
+
+    /* Player overlay */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .overlay-card {
+      background: #fffaf3;
+      border-radius: 24px;
+      padding: 18px 20px 18px;
+      border: 4px solid #f97316;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+      width: min(420px, 90vw);
+      max-height: 90vh;
+      overflow: auto;
+    }
+
+    .overlay-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .overlay-title span.icon {
+      font-size: 1.6rem;
+    }
+
+    .overlay-title h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .overlay-sub {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .player-input-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .player-input-row label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      min-width: 52px;
+    }
+
+    .player-input-row input {
+      flex: 1;
+      border-radius: 999px;
+      border: 2px solid rgba(148,163,184,0.7);
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .player-input-row input:focus {
+      border-color: #f97316;
+      box-shadow: 0 0 0 2px rgba(248,177,88,0.6);
+    }
+
+    .overlay-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .overlay-error {
+      font-size: 0.8rem;
+      color: #b91c1c;
+      margin-top: 4px;
+      min-height: 1em;
+    }
+
+    .overlay-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .overlay button.small {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
   <div class="table">
-    <!-- Title / logo -->
     <div class="table-title">
       <div class="table-title-icon">👃</div>
       <div class="table-title-text">
@@ -569,7 +730,6 @@
       </div>
     </div>
 
-    <!-- Score chips -->
     <div class="score-card">
       <div class="score-chip">
         Rounds
@@ -581,7 +741,6 @@
       </div>
     </div>
 
-    <!-- Card layout -->
     <div class="table-inner">
       <!-- Main game card -->
       <section class="card card-main" aria-label="Game Controls">
@@ -590,6 +749,16 @@
           <span class="emoji">🎴</span>
           Smell Pair
         </h2>
+
+        <!-- Current players for this round -->
+        <div class="player-round-card" id="player-round-card" style="display:none;">
+          <div class="player-round-label">This round</div>
+          <div class="player-round-names">
+            <span id="player-a-name">Player A</span>
+            <span>&amp;</span>
+            <span id="player-b-name">Player B</span>
+          </div>
+        </div>
 
         <div>
           <div class="categories" id="category-buttons">
@@ -655,107 +824,152 @@
       </section>
 
       <!-- Side rules card -->
-      <aside class="card card-side" aria-label="How to Play">
-        <div class="card-header-label">Rules</div>
-        <div class="side-panel-section">
-          <h3>How to Play</h3>
-          <div class="instructions">
-            <ol>
-              <li>Choose a <strong>category card</strong>.</li>
-              <li>The table shows two <strong>jar numbers</strong>.</li>
-              <li>Give each jar to a different player.</li>
-              <li>Start the <strong>2 minute timer</strong>.</li>
-              <li>Each player smells their jar and describes it. Together, guess what the two scents combine into.</li>
-              <li>When time is up, stop, agree on your guess, then press <strong>Reveal Answer</strong> and mark your score.</li>
-            </ol>
-          </div>
+      <aside class="card card-side" aria-label="How to Play" id="rules-card">
+        <div class="card-side-header-row">
+          <div class="card-header-label">Rules</div>
+          <button class="rules-toggle-btn" id="rules-toggle-btn" type="button">
+            Hide
+          </button>
         </div>
 
-        <div class="side-panel-section">
-          <h3>Table Setup</h3>
-          <div class="badge">
-            ⏱ 2 minute rounds
+        <div class="side-content" id="rules-content">
+          <div class="side-panel-section">
+            <h3>How to Play</h3>
+            <div class="instructions">
+              <ol>
+                <li>Choose a <strong>category card</strong>.</li>
+                <li>The table shows two <strong>jar numbers</strong>.</li>
+                <li>Give each jar to a different player.</li>
+                <li>Start the <strong>2 minute timer</strong>.</li>
+                <li>Each player smells their jar and describes it. Together, guess what the two scents combine into.</li>
+                <li>When time is up, stop, agree on your guess, then press <strong>Reveal Answer</strong> and mark your score.</li>
+              </ol>
+            </div>
           </div>
-          <div class="pill-row">
-            <div class="tiny-pill">Shared screen</div>
-            <div class="tiny-pill">Honour scoring</div>
-            <div class="tiny-pill">Re-usable scents</div>
-          </div>
-          <div class="note">
-            Edit scent pairs &amp; jar numbers in the <code>gameData</code> object in the script below.
+
+          <div class="side-panel-section">
+            <h3>Table Setup</h3>
+            <div class="badge">
+              ⏱ 2 minute rounds
+            </div>
+            <div class="pill-row">
+              <div class="tiny-pill">Shared screen</div>
+              <div class="tiny-pill">Honour scoring</div>
+              <div class="tiny-pill">Re-usable scents</div>
+            </div>
+            <div class="note">
+              Edit scent pairs &amp; jar numbers in the <code>gameData</code> object in the script below.
+            </div>
           </div>
         </div>
       </aside>
     </div>
   </div>
 
-    <script>
-      // ----------------------------
-      // Game data (EDIT THIS PART)
-      // ----------------------------
-      // Replace these with your real scent pairs and jar numbers.
-      const gameData = {
-        categories: [
-          {
-            id: "locations",
-            name: "Places / Locations",
-            description: "Spaces you can stand in or move through.",
-            pairs: [
-              {
-                id: "campfire",
-                answer: "Campfire",
-                jars: [1, 2], // Jar numbers on your physical jars
-                scentLabels: ["Smoke", "Pine trees"],
-              },
-              {
-                id: "farm",
-                answer: "Farm",
-                jars: [3, 4],
-                scentLabels: ["Hay", "Manure"],
-              },
-            ],
-          },
-          {
-            id: "food-drink",
-            name: "Food & Drinks",
-            description: "Edible things and beverages.",
-            pairs: [
-              {
-                id: "bakery",
-                answer: "Bakery",
-                jars: [5, 6],
-                scentLabels: ["Caramel", "Vanilla"],
-              },
-              {
-                id: "coffee-shop",
-                answer: "Coffee Shop",
-                jars: [7, 8],
-                scentLabels: ["Coffee", "Sweet pastry"],
-              },
-            ],
-          },
-          {
-            id: "things",
-            name: "Objects / Things",
-            description: "Everyday objects or scenes.",
-            pairs: [
-              {
-                id: "christmas-tree",
-                answer: "Christmas Tree",
-                jars: [9, 10],
-                scentLabels: ["Pine", "Cinnamon / spices"],
-              },
-              {
-                id: "beach-day",
-                answer: "Beach Day",
-                jars: [11, 12],
-                scentLabels: ["Salt water", "Sunscreen / coconut"],
-              },
-            ],
-          },
-        ],
-        roundDurationSeconds: 120,
-      };
+  <!-- Player setup overlay -->
+  <div class="overlay" id="player-overlay">
+    <div class="overlay-card">
+      <div class="overlay-title">
+        <span class="icon">🧑‍🤝‍🧑</span>
+        <h2>Who’s playing?</h2>
+      </div>
+      <div class="overlay-sub">
+        Add at least two players. Each round, two people will be randomly chosen to play.
+      </div>
+
+      <div id="player-inputs">
+        <div class="player-input-row">
+          <label>Player 1</label>
+          <input type="text" class="player-input" placeholder="Name">
+        </div>
+        <div class="player-input-row">
+          <label>Player 2</label>
+          <input type="text" class="player-input" placeholder="Name">
+        </div>
+      </div>
+
+      <div class="overlay-actions">
+        <button class="secondary small" id="add-player-btn" type="button">
+          ➕ Add player
+        </button>
+        <button class="primary small" id="start-game-btn" type="button">
+          ▶ Start game
+        </button>
+      </div>
+
+      <div class="overlay-error" id="overlay-error"></div>
+      <div class="overlay-note">
+        You can add up to 10 players. Names can be changed later by reloading the page.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Game data (EDIT THIS PART)
+    // ----------------------------
+    const gameData = {
+      categories: [
+        {
+          id: 'locations',
+          name: 'Places / Locations',
+          description: 'Spaces you can stand in or move through.',
+          pairs: [
+            {
+              id: 'campfire',
+              answer: 'Campfire',
+              jars: [1, 2],
+              scentLabels: ['Smoke', 'Pine trees']
+            },
+            {
+              id: 'farm',
+              answer: 'Farm',
+              jars: [3, 4],
+              scentLabels: ['Hay', 'Manure']
+            }
+          ]
+        },
+        {
+          id: 'food-drink',
+          name: 'Food & Drinks',
+          description: 'Edible things and beverages.',
+          pairs: [
+            {
+              id: 'bakery',
+              answer: 'Bakery',
+              jars: [5, 6],
+              scentLabels: ['Caramel', 'Vanilla']
+            },
+            {
+              id: 'coffee-shop',
+              answer: 'Coffee Shop',
+              jars: [7, 8],
+              scentLabels: ['Coffee', 'Sweet pastry']
+            }
+          ]
+        },
+        {
+          id: 'things',
+          name: 'Objects / Things',
+          description: 'Everyday objects or scenes.',
+          pairs: [
+            {
+              id: 'christmas-tree',
+              answer: 'Christmas Tree',
+              jars: [9, 10],
+              scentLabels: ['Pine', 'Cinnamon / spices']
+            },
+            {
+              id: 'beach-day',
+              answer: 'Beach Day',
+              jars: [11, 12],
+              scentLabels: ['Salt water', 'Sunscreen / coconut']
+            }
+          ]
+        }
+      ],
+      roundDurationSeconds: 120
+    };
 
     // ----------------------------
     // State
@@ -768,6 +982,9 @@
     let timerFinished = false;
     let roundsPlayed = 0;
     let roundsCorrect = 0;
+
+    let players = [];
+    let currentRoundPlayers = [];
 
     // ----------------------------
     // DOM Elements
@@ -793,6 +1010,21 @@
     const incorrectBtn = document.getElementById('incorrect-btn');
     const roundsCountLabel = document.getElementById('rounds-count');
     const correctCountLabel = document.getElementById('correct-count');
+
+    const rulesCard = document.getElementById('rules-card');
+    const rulesToggleBtn = document.getElementById('rules-toggle-btn');
+
+    // Player round card
+    const playerRoundCard = document.getElementById('player-round-card');
+    const playerANameEl = document.getElementById('player-a-name');
+    const playerBNameEl = document.getElementById('player-b-name');
+
+    // Overlay elements
+    const playerOverlay = document.getElementById('player-overlay');
+    const playerInputsContainer = document.getElementById('player-inputs');
+    const addPlayerBtn = document.getElementById('add-player-btn');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const overlayError = document.getElementById('overlay-error');
 
     // ----------------------------
     // Helpers
@@ -884,6 +1116,7 @@
         newPairBtn.disabled = true;
         resetBtn.disabled = true;
         startBtn.disabled = true;
+        playerRoundCard.style.display = 'none';
       } else {
         currentPair = null;
         roundInfo.style.display = 'none';
@@ -957,10 +1190,37 @@
       revealAnswerBtn.style.display = 'none';
     }
 
+    // Pick two distinct players for this round
+    function pickPlayersForRound() {
+      if (!players || players.length < 2) {
+        currentRoundPlayers = [];
+        playerRoundCard.style.display = 'none';
+        return;
+      }
+      if (players.length === 2) {
+        currentRoundPlayers = [players[0], players[1]];
+      } else {
+        const idx1 = Math.floor(Math.random() * players.length);
+        let idx2 = Math.floor(Math.random() * players.length);
+        while (idx2 === idx1) {
+          idx2 = Math.floor(Math.random() * players.length);
+        }
+        currentRoundPlayers = [players[idx1], players[idx2]];
+      }
+      playerANameEl.textContent = currentRoundPlayers[0];
+      playerBNameEl.textContent = currentRoundPlayers[1];
+      playerRoundCard.style.display = 'flex';
+    }
+
     // ----------------------------
     // Event handlers
     // ----------------------------
     function handleCategoryClick(categoryId) {
+      if (players.length < 2) {
+        alert('Please add at least two players before starting.');
+        return;
+      }
+
       const cat = gameData.categories.find(c => c.id === categoryId);
       if (!cat) return;
 
@@ -975,6 +1235,7 @@
 
       currentCategory = cat;
       currentPair = pickRandomPair(cat);
+      pickPlayersForRound();
       setTimer(gameData.roundDurationSeconds);
       timerFinished = false;
       hideRevealPanel();
@@ -985,7 +1246,7 @@
       resetBtn.disabled = false;
       startBtn.disabled = false;
 
-      updateStatus(`Playing in “${cat.name}”. Hand out the jars, then start the timer.`, false);
+      updateStatus(`Playing in “${cat.name}”. Hand out the jars to ${currentRoundPlayers[0]} and ${currentRoundPlayers[1]}, then start the timer.`, false);
     }
 
     newPairBtn.addEventListener('click', () => {
@@ -996,12 +1257,13 @@
       hideRevealPanel();
 
       currentPair = pickRandomPair(currentCategory);
+      pickPlayersForRound();
       renderRoundInfo();
       newPairBtn.disabled = false;
       resetBtn.disabled = false;
       startBtn.disabled = false;
 
-      updateStatus('New pair selected. Hand out the jars, then start the timer.', false);
+      updateStatus(`New pair selected. Jars go to ${currentRoundPlayers[0]} and ${currentRoundPlayers[1]}. Hand them out, then start the timer.`, false);
     });
 
     resetBtn.addEventListener('click', () => {
@@ -1032,6 +1294,61 @@
       resetRound(false);
     });
 
+    // Rules card toggle
+    rulesToggleBtn.addEventListener('click', () => {
+      const isCollapsed = rulesCard.classList.toggle('collapsed');
+      if (isCollapsed) {
+        rulesToggleBtn.textContent = 'Show';
+      } else {
+        rulesToggleBtn.textContent = 'Hide';
+      }
+    });
+
+    // Player overlay logic
+    function getPlayerInputs() {
+      return Array.from(document.querySelectorAll('.player-input'));
+    }
+
+    function collectPlayers() {
+      const inputs = getPlayerInputs();
+      const names = inputs
+        .map(input => input.value.trim())
+        .filter(name => name.length > 0);
+      return names;
+    }
+
+    addPlayerBtn.addEventListener('click', () => {
+      const currentCount = getPlayerInputs().length;
+      if (currentCount >= 10) {
+        overlayError.textContent = 'You can’t add more than 10 players.';
+        return;
+      }
+      overlayError.textContent = '';
+      const row = document.createElement('div');
+      row.className = 'player-input-row';
+      const label = document.createElement('label');
+      label.textContent = `Player ${currentCount + 1}`;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'player-input';
+      input.placeholder = 'Name';
+      row.appendChild(label);
+      row.appendChild(input);
+      playerInputsContainer.appendChild(row);
+    });
+
+    startGameBtn.addEventListener('click', () => {
+      const names = collectPlayers();
+      if (names.length < 2) {
+        overlayError.textContent = 'Please enter at least two player names.';
+        return;
+      }
+      players = names;
+      overlayError.textContent = '';
+      playerOverlay.style.display = 'none';
+      updateStatus('Select a category to start a round.', false);
+    });
+
     // ----------------------------
     // Initial render
     // ----------------------------
@@ -1060,7 +1377,7 @@
     function init() {
       initCategories();
       setTimer(gameData.roundDurationSeconds);
-      updateStatus('Select a category to start a round.', false);
+      updateStatus('Add players to begin.', false);
       newPairBtn.disabled = true;
       resetBtn.disabled = true;
       startBtn.disabled = true;
