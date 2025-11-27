@@ -1,942 +1,1073 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Scent Heads Up</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      :root {
-        --bg: #111827;
-        --bg-alt: #020617;
-        --card: #1f2937;
-        --accent: #f97316;
-        --accent-soft: rgba(249, 115, 22, 0.12);
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --danger: #ef4444;
-        --success: #22c55e;
-        --radius: 16px;
-        --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.4);
-      }
+<head>
+  <meta charset="UTF-8">
+  <title>Scent Heads Up – Tabletop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Optional fun font -->
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --table-green: #14532d;
+      --table-dark: #052e16;
+      --card-bg: #fffaf3;
+      --card-edge: #f97316;
+      --card-edge-soft: #fed7aa;
+      --accent-pink: #fb7185;
+      --accent-blue: #38bdf8;
+      --accent-gold: #fbbf24;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --danger: #f97373;
+      --success: #4ade80;
+      --shadow-card: 0 14px 30px rgba(0,0,0,0.35);
+      --radius-card: 22px;
+    }
 
-      * {
-        box-sizing: border-box;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-          "Segoe UI", sans-serif;
-      }
+    * {
+      box-sizing: border-box;
+      font-family: "Baloo 2", system-ui, -apple-system, BlinkMacSystemFont,
+                   "SF Pro Text", "Segoe UI", sans-serif;
+    }
 
-      body {
-        margin: 0;
-        padding: 0;
-        background: radial-gradient(
-          circle at top,
-          #1f2937 0,
-          #020617 45%,
-          #000 100%
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(15,118,110,0.45), transparent 55%),
+        radial-gradient(circle at bottom, rgba(22,101,52,0.75), transparent 60%),
+        radial-gradient(circle at center, #166534 0, #052e16 60%, #02140b 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .table {
+      width: min(1100px, 100vw - 24px);
+      height: min(720px, 100vh - 24px);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(248,250,252,0.08), transparent 55%),
+        radial-gradient(circle at 80% 90%, rgba(15,23,42,0.25), transparent 55%),
+        repeating-linear-gradient(
+          135deg,
+          rgba(15,118,110,0.4),
+          rgba(15,118,110,0.4) 6px,
+          rgba(12,148,136,0.6) 6px,
+          rgba(12,148,136,0.6) 12px
         );
-        color: var(--text);
-        min-height: 100vh;
-        display: flex;
-        align-items: stretch;
-        justify-content: center;
-      }
+      border-radius: 32px;
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.6),
+        inset 0 0 0 6px rgba(15,23,42,0.65);
+      border: 10px solid #3f2305;
+      position: relative;
+      padding: 18px 18px 22px;
+      overflow: hidden;
+    }
 
-      .app {
-        width: 100%;
-        max-width: 900px;
-        margin: 20px;
-        padding: 24px 24px 32px;
-        background: linear-gradient(
-          145deg,
-          rgba(15, 23, 42, 0.96),
-          rgba(15, 23, 42, 0.9)
-        );
-        border-radius: 24px;
-        box-shadow: var(--shadow-soft);
-        border: 1px solid rgba(148, 163, 184, 0.3);
+    /* Small "chip" style header for score */
+    .score-card {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      background: radial-gradient(circle at top, #fef3c7, #fffbeb);
+      border-radius: 999px;
+      padding: 6px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.45);
+      border: 3px solid #b45309;
+      transform: rotate(1.5deg);
+    }
+
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid rgba(15,23,42,0.15);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .score-chip span.value {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .score-chip.correct {
+      border-color: rgba(34,197,94,0.8);
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .table-title {
+      position: absolute;
+      top: 18px;
+      left: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: #fefce8;
+      text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+    }
+
+    .table-title-icon {
+      font-size: 1.6rem;
+      background: radial-gradient(circle at top, #fb7185, #f97316);
+      border-radius: 999px;
+      padding: 6px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      border: 2px solid rgba(254,249,195,0.8);
+    }
+
+    .table-title-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .table-title-text .main {
+      font-size: 1.2rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .table-title-text .sub {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    /* Card layout area */
+    .table-inner {
+      position: absolute;
+      inset: 70px 20px 18px 20px;
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      gap: 14px;
+      align-items: center;
+      justify-items: center;
+    }
+
+    @media (max-width: 900px) or (max-height: 650px) {
+      .table {
+        height: auto;
+        min-height: 640px;
+      }
+      .table-inner {
+        position: static;
+        margin-top: 68px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-      }
-
-      header {
-        display: flex;
-        justify-content: space-between;
         align-items: center;
-        gap: 16px;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.35);
-        padding-bottom: 12px;
       }
+    }
 
-      header h1 {
-        margin: 0;
-        font-size: 1.4rem;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-        color: #e5e7eb;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-card);
+      border: 4px solid var(--card-edge);
+      box-shadow: var(--shadow-card);
+      padding: 14px 16px 18px;
+      max-width: 100%;
+    }
 
-      header h1 span.icon {
-        font-size: 1.5rem;
-      }
+    .card-main {
+      width: 100%;
+      max-width: 640px;
+      transform: rotate(-2.2deg);
+      border-color: var(--card-edge-soft);
+      background:
+        radial-gradient(circle at top left, #fef3c7, transparent 55%),
+        var(--card-bg);
+    }
 
-      .scoreboard {
-        text-align: right;
-        font-size: 0.83rem;
-        color: var(--muted);
-      }
+    .card-side {
+      width: 100%;
+      max-width: 360px;
+      transform: rotate(3deg);
+      background:
+        radial-gradient(circle at bottom right, #e0f2fe, transparent 55%),
+        var(--card-bg);
+      border-color: #38bdf8;
+    }
 
-      .scoreboard span {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(148, 163, 184, 0.3);
-        margin-left: 6px;
-      }
+    .card-header-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
 
-      .scoreboard .correct {
-        color: var(--success);
-        border-color: rgba(34, 197, 94, 0.4);
-      }
+    .card-main h2 {
+      margin: 0 0 4px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-      .scoreboard .rounds {
-        color: var(--muted);
-      }
+    .card-main h2 span.emoji {
+      font-size: 1.2rem;
+    }
 
-      main {
-        display: grid;
-        grid-template-columns: 1.15fr 0.85fr;
-        gap: 18px;
-      }
+    /* Category row styled as cards */
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 2px 0 6px;
+    }
 
-      @media (max-width: 800px) {
-        main {
-          grid-template-columns: 1fr;
-        }
-      }
+    .category-btn {
+      flex: 1 1 31%;
+      min-width: 145px;
+      border-radius: 18px;
+      padding: 8px 10px;
+      background: #fefce8;
+      border: 2px solid #facc15;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
 
-      .panel {
-        background: radial-gradient(
-          circle at top left,
-          rgba(15, 23, 42, 0.9),
-          #020617
-        );
-        border-radius: var(--radius);
-        padding: 16px 18px 18px;
-        border: 1px solid rgba(55, 65, 81, 0.8);
-        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
-      }
+    .category-btn span.label {
+      text-align: left;
+      font-weight: 600;
+    }
 
-      .panel h2 {
-        margin: 0 0 10px;
-        font-size: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: var(--muted);
-      }
+    .category-btn span.pill {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #b91c1c;
+    }
 
-      .categories {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-      }
+    .category-btn:hover {
+      transform: translateY(-1px) rotate(-0.8deg);
+      box-shadow: 0 7px 16px rgba(0,0,0,0.18);
+      background: #fffbeb;
+    }
 
-      .category-btn {
-        flex: 1 1 30%;
-        min-width: 140px;
-        border-radius: 999px;
-        padding: 10px 14px;
-        background: #020617;
-        border: 1px solid rgba(148, 163, 184, 0.6);
-        color: var(--text);
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        cursor: pointer;
-        transition: all 0.15s ease;
-      }
+    .category-btn.active {
+      background: #ffedd5;
+      border-color: #f97316;
+      box-shadow: 0 0 0 3px rgba(248,171,94,0.7);
+    }
 
-      .category-btn span.label {
-        text-align: left;
-      }
+    .status-line {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-      .category-btn span.pill {
-        font-size: 0.7rem;
-        padding: 3px 7px;
-        border-radius: 999px;
-        background: rgba(148, 163, 184, 0.18);
-        color: var(--muted);
-      }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #d4d4d8;
+    }
 
-      .category-btn:hover {
-        border-color: var(--accent);
-        background: radial-gradient(
-          circle at top,
-          rgba(249, 115, 22, 0.15),
-          #020617
-        );
-        transform: translateY(-1px);
-      }
+    .dot.live {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.3);
+    }
 
-      .category-btn.active {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 1px rgba(249, 115, 22, 0.6);
-        background: radial-gradient(
-          circle at top left,
-          var(--accent-soft),
-          #020617
-        );
-      }
+    .round-info {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 16px;
+      background: #fffbeb;
+      border: 2px dashed #f59e0b;
+      font-size: 0.88rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-      .status-line {
-        margin-top: 10px;
-        font-size: 0.9rem;
-        color: var(--muted);
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
+    .round-info strong {
+      color: #b45309;
+    }
 
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: #4b5563;
-      }
+    .jar-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 2px;
+      flex-wrap: wrap;
+    }
 
-      .dot.live {
-        background: var(--accent);
-        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.5);
-      }
+    .jar-pill {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 2px solid #fecaca;
+      font-size: 0.88rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 3px 7px rgba(0,0,0,0.07);
+    }
 
-      .round-info {
-        margin-top: 8px;
-        padding: 10px 12px;
-        border-radius: 14px;
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px dashed rgba(148, 163, 184, 0.6);
-        font-size: 0.9rem;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
+    .jar-pill span.label {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
 
-      .round-info strong {
-        color: #fbbf24;
-      }
+    .jar-pill span.value {
+      font-weight: 700;
+      color: var(--text-main);
+    }
 
-      .jar-row {
-        display: flex;
-        gap: 8px;
-        margin-top: 4px;
-        flex-wrap: wrap;
-      }
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
 
-      .jar-pill {
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.9);
-        border: 1px solid rgba(249, 115, 22, 0.7);
-        font-size: 0.9rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
+    /* Timer as a card inset */
+    .timer-block {
+      margin-top: 10px;
+      padding: 10px 10px;
+      border-radius: 18px;
+      background: radial-gradient(circle at top left, #dbeafe, #e0f2fe);
+      border: 2px solid #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
 
-      .jar-pill span.label {
-        color: var(--muted);
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
+    .timer-display {
+      font-variant-numeric: tabular-nums;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #1d4ed8;
+      text-shadow: 0 1px 0 #bfdbfe;
+    }
 
-      .jar-pill span.value {
-        font-weight: 600;
-        color: var(--text);
-      }
+    .timer-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #2563eb;
+    }
 
-      .hint {
-        font-size: 0.8rem;
-        color: var(--muted);
-        margin-top: 6px;
-      }
+    .timer-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: flex-end;
+    }
 
-      .timer-block {
-        margin-top: 12px;
-        padding: 10px 12px;
-        border-radius: 14px;
-        background: radial-gradient(
-          circle at top,
-          rgba(30, 64, 175, 0.65),
-          #020617
-        );
-        border: 1px solid rgba(59, 130, 246, 0.7);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-      }
+    button {
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+      background: #e5e7eb;
+      color: var(--text-main);
+      font-weight: 500;
+    }
 
-      .timer-display {
-        font-variant-numeric: tabular-nums;
-        font-size: 1.8rem;
-        font-weight: 600;
-      }
+    button.primary {
+      background: linear-gradient(135deg, var(--accent-pink), var(--accent-gold));
+      color: #111827;
+      font-weight: 700;
+      box-shadow: 0 5px 12px rgba(0,0,0,0.35);
+      border: 2px solid rgba(248,250,252,0.7);
+    }
 
-      .timer-label {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        color: #bfdbfe;
-      }
+    button.secondary {
+      background: #ffffff;
+      border: 2px solid rgba(148,163,184,0.7);
+      color: #374151;
+    }
 
-      .timer-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: flex-end;
-      }
+    button.ghost {
+      background: #f9fafb;
+      color: var(--text-muted);
+      border: 2px dashed rgba(148,163,184,0.7);
+    }
 
-      button {
-        border: none;
-        cursor: pointer;
-        border-radius: 999px;
-        padding: 8px 14px;
-        font-size: 0.85rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.15s ease;
-        background: #111827;
-        color: var(--text);
-      }
+    button.danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 2px solid rgba(248,113,113,0.9);
+    }
 
-      button.primary {
-        background: linear-gradient(135deg, #f97316, #fbbf24);
-        color: #111827;
-        font-weight: 600;
-      }
+    button.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 2px solid rgba(74,222,128,0.9);
+    }
 
-      button.secondary {
-        background: #020617;
-        border: 1px solid rgba(148, 163, 184, 0.6);
-        color: var(--muted);
-      }
+    button.wide {
+      width: 100%;
+      justify-content: center;
+    }
 
-      button.ghost {
-        background: transparent;
-        color: var(--muted);
-        border: 1px dashed rgba(75, 85, 99, 0.8);
-      }
+    button:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none !important;
+      box-shadow: none !important;
+    }
 
-      button.danger {
-        background: rgba(127, 29, 29, 0.95);
-        color: #fecaca;
-      }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+    }
 
-      button.success {
-        background: rgba(6, 95, 70, 0.95);
-        color: #bbf7d0;
-      }
+    .reveal-panel {
+      margin-top: 10px;
+      padding: 10px 10px 8px;
+      border-radius: 16px;
+      border: 2px solid #fed7aa;
+      background: #fffbeb;
+      font-size: 0.9rem;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+    }
 
-      button:disabled {
-        opacity: 0.45;
-        cursor: default;
-        transform: none !important;
-      }
+    .reveal-heading {
+      font-weight: 700;
+      color: #b45309;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-      button:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      }
+    .reveal-heading::before {
+      content: "⏰";
+    }
 
-      .reveal-panel {
-        margin-top: 14px;
-        padding: 12px 12px 10px;
-        border-radius: 16px;
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        background: rgba(15, 23, 42, 0.95);
-        font-size: 0.9rem;
-        display: none;
-        flex-direction: column;
-        gap: 8px;
-      }
+    .reveal-sub {
+      font-size: 0.82rem;
+      color: #92400e;
+    }
 
-      .answer-text {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #fbbf24;
-      }
+    .answer-text {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ea580c;
+      margin-top: 4px;
+    }
 
-      .answer-meta {
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
+    .answer-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
-      .answer-actions {
-        margin-top: 6px;
-        display: flex;
-        justify-content: flex-start;
-        gap: 8px;
-      }
+    .answer-actions {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+    }
 
-      .side-panel-section {
-        margin-bottom: 14px;
-      }
+    .note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
 
-      .side-panel-section h3 {
-        margin: 0 0 6px;
-        font-size: 0.9rem;
-        color: var(--muted);
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-      }
+    /* Side card: rules */
+    .side-panel-section {
+      margin-bottom: 10px;
+    }
 
-      .instructions {
-        font-size: 0.84rem;
-        color: var(--muted);
-        line-height: 1.5;
-      }
+    .side-panel-section h3 {
+      margin: 0 0 4px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
 
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        font-size: 0.75rem;
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: rgba(15, 23, 42, 0.95);
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        color: var(--muted);
-      }
+    .instructions {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
 
-      .pill-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        font-size: 0.78rem;
-      }
+    .instructions ol {
+      padding-left: 18px;
+      margin: 3px 0 0;
+    }
 
-      .tiny-pill {
-        border-radius: 999px;
-        padding: 4px 7px;
-        background: rgba(31, 41, 55, 0.9);
-        border: 1px solid rgba(75, 85, 99, 0.9);
-        color: var(--muted);
-      }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #e0f2fe;
+      border: 2px solid rgba(59,130,246,0.9);
+      color: #1d4ed8;
+      font-weight: 600;
+    }
 
-      .note {
-        font-size: 0.78rem;
-        color: var(--muted);
-        margin-top: 8px;
-        opacity: 0.8;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="app">
-      <header>
-        <h1>
-          <span class="icon">👃</span>
-          Scent Heads Up
-        </h1>
-        <div class="scoreboard">
-          <span class="rounds"
-            >Rounds: <strong id="rounds-count">0</strong></span
-          >
-          <span class="correct"
-            >Correct: <strong id="correct-count">0</strong></span
-          >
-        </div>
-      </header>
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      font-size: 0.78rem;
+      margin-top: 4px;
+    }
 
-      <main>
-        <!-- LEFT: Game controls -->
-        <section class="panel" aria-label="Game Controls">
-          <h2>Round Setup</h2>
+    .tiny-pill {
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: #f3e8ff;
+      border: 1px solid rgba(167,139,250,0.9);
+      color: #6d28d9;
+    }
 
-          <div>
-            <div class="categories" id="category-buttons">
-              <!-- category buttons populated by JS -->
-            </div>
-
-            <div class="status-line">
-              <div class="dot" id="status-dot"></div>
-              <span id="status-text">Select a category to start a round.</span>
-            </div>
-
-            <div class="round-info" id="round-info" style="display: none">
-              <div><strong id="round-category-label">Category: –</strong></div>
-              <div class="jar-row" id="jar-row">
-                <!-- jar pills injected via JS -->
-              </div>
-              <div class="hint">
-                Hand each jar to a different player. Don’t say the labels out
-                loud — only describe the smells.
-              </div>
-            </div>
-
-            <div class="timer-block" aria-label="Round Timer">
-              <div>
-                <div class="timer-label">Countdown</div>
-                <div class="timer-display" id="timer-display">02:00</div>
-              </div>
-              <div class="timer-controls">
-                <button class="secondary" id="new-pair-btn" disabled>
-                  🎲 New Pair
-                </button>
-                <button class="ghost" id="reset-btn" disabled>⏹ Reset</button>
-                <button class="primary" id="start-btn" disabled>
-                  ▶ Start 2 min
-                </button>
-              </div>
-            </div>
-
-            <div class="reveal-panel" id="reveal-panel">
-              <div class="answer-text" id="answer-text">Answer: –</div>
-              <div class="answer-meta" id="answer-meta"></div>
-              <div class="answer-actions">
-                <button class="success" id="correct-btn">
-                  ✅ We got it right
-                </button>
-                <button class="danger" id="incorrect-btn">
-                  ❌ We missed it
-                </button>
-              </div>
-              <div class="note">
-                Scoring is on the honour system. Be honest with yourselves. 😉
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- RIGHT: Instructions / helper text -->
-        <aside class="panel" aria-label="How to Play">
-          <div class="side-panel-section">
-            <h3>How to Play</h3>
-            <div class="instructions">
-              <ol>
-                <li>Choose a <strong>category</strong>.</li>
-                <li>
-                  The screen will show you two <strong>jar numbers</strong>.
-                </li>
-                <li>Give each jar to a different player.</li>
-                <li>Start the <strong>2 minute timer</strong>.</li>
-                <li>
-                  Each player smells their jar and describes it. Talk it out and
-                  try to guess what the two scents combine into.
-                </li>
-                <li>
-                  When the time is up, reveal the answer and mark whether you
-                  were right or wrong.
-                </li>
-              </ol>
-            </div>
-          </div>
-
-          <div class="side-panel-section">
-            <h3>Current Settings</h3>
-            <div class="badge">⏱ 2 min rounds</div>
-            <div class="pill-row" style="margin-top: 6px">
-              <div class="tiny-pill">Shared screen</div>
-              <div class="tiny-pill">Honour-based scoring</div>
-              <div class="tiny-pill">Re-usable scents</div>
-            </div>
-            <div class="note">
-              You can change the scent pairs and jar numbers directly in the
-              JavaScript <code>gameData</code> object.
-            </div>
-          </div>
-        </aside>
-      </main>
+    code {
+      font-size: 0.78rem;
+      background: #f9fafb;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="table">
+    <!-- Title / logo -->
+    <div class="table-title">
+      <div class="table-title-icon">👃</div>
+      <div class="table-title-text">
+        <div class="main">Scent Heads Up</div>
+        <div class="sub">Tabletop Edition</div>
+      </div>
     </div>
 
-    <script>
-      // ----------------------------
-      // Game data (EDIT THIS PART)
-      // ----------------------------
-      // Replace these with your real scent pairs and jar numbers.
-      const gameData = {
-        categories: [
-          {
-            id: "locations",
-            name: "Places / Locations",
-            description: "Spaces you can stand in or move through.",
-            pairs: [
-              {
-                id: "campfire",
-                answer: "Campfire",
-                jars: [1, 2], // Jar numbers on your physical jars
-                scentLabels: ["Smoke", "Pine trees"],
-              },
-              {
-                id: "farm",
-                answer: "Farm",
-                jars: [3, 4],
-                scentLabels: ["Hay", "Manure"],
-              },
-            ],
-          },
-          {
-            id: "food-drink",
-            name: "Food & Drinks",
-            description: "Edible things and beverages.",
-            pairs: [
-              {
-                id: "bakery",
-                answer: "Bakery",
-                jars: [5, 6],
-                scentLabels: ["Caramel", "Vanilla"],
-              },
-              {
-                id: "coffee-shop",
-                answer: "Coffee Shop",
-                jars: [7, 8],
-                scentLabels: ["Coffee", "Sweet pastry"],
-              },
-            ],
-          },
-          {
-            id: "things",
-            name: "Objects / Things",
-            description: "Everyday objects or scenes.",
-            pairs: [
-              {
-                id: "christmas-tree",
-                answer: "Christmas Tree",
-                jars: [9, 10],
-                scentLabels: ["Pine", "Cinnamon / spices"],
-              },
-              {
-                id: "beach-day",
-                answer: "Beach Day",
-                jars: [11, 12],
-                scentLabels: ["Salt water", "Sunscreen / coconut"],
-              },
-            ],
-          },
-        ],
-        roundDurationSeconds: 120,
-      };
+    <!-- Score chips -->
+    <div class="score-card">
+      <div class="score-chip">
+        Rounds
+        <span class="value" id="rounds-count">0</span>
+      </div>
+      <div class="score-chip correct">
+        Correct
+        <span class="value" id="correct-count">0</span>
+      </div>
+    </div>
 
-      // ----------------------------
-      // State
-      // ----------------------------
-      let currentCategory = null;
-      let currentPair = null;
-      let timerSecondsRemaining = gameData.roundDurationSeconds;
-      let timerIntervalId = null;
-      let timerRunning = false;
-      let timerFinished = false;
-      let roundsPlayed = 0;
-      let roundsCorrect = 0;
+    <!-- Card layout -->
+    <div class="table-inner">
+      <!-- Main game card -->
+      <section class="card card-main" aria-label="Game Controls">
+        <div class="card-header-label">Round</div>
+        <h2>
+          <span class="emoji">🎴</span>
+          Smell Pair
+        </h2>
 
-      // ----------------------------
-      // DOM Elements
-      // ----------------------------
-      const categoryButtonsContainer =
-        document.getElementById("category-buttons");
-      const statusDot = document.getElementById("status-dot");
-      const statusText = document.getElementById("status-text");
-      const roundInfo = document.getElementById("round-info");
-      const roundCategoryLabel = document.getElementById(
-        "round-category-label"
-      );
-      const jarRow = document.getElementById("jar-row");
-      const timerDisplay = document.getElementById("timer-display");
-      const newPairBtn = document.getElementById("new-pair-btn");
-      const resetBtn = document.getElementById("reset-btn");
-      const startBtn = document.getElementById("start-btn");
-      const revealPanel = document.getElementById("reveal-panel");
-      const answerText = document.getElementById("answer-text");
-      const answerMeta = document.getElementById("answer-meta");
-      const correctBtn = document.getElementById("correct-btn");
-      const incorrectBtn = document.getElementById("incorrect-btn");
-      const roundsCountLabel = document.getElementById("rounds-count");
-      const correctCountLabel = document.getElementById("correct-count");
+        <div>
+          <div class="categories" id="category-buttons">
+            <!-- category buttons populated by JS -->
+          </div>
 
-      // ----------------------------
-      // Helpers
-      // ----------------------------
-      function formatTime(seconds) {
-        const m = Math.floor(seconds / 60)
-          .toString()
-          .padStart(2, "0");
-        const s = (seconds % 60).toString().padStart(2, "0");
-        return `${m}:${s}`;
-      }
+          <div class="status-line">
+            <div class="dot" id="status-dot"></div>
+            <span id="status-text">Select a category to start a round.</span>
+          </div>
 
-      function setTimer(seconds) {
-        timerSecondsRemaining = seconds;
-        timerDisplay.textContent = formatTime(timerSecondsRemaining);
-      }
+          <div class="round-info" id="round-info" style="display:none;">
+            <div><strong id="round-category-label">Category: –</strong></div>
+            <div class="jar-row" id="jar-row">
+              <!-- jar pills injected via JS -->
+            </div>
+            <div class="hint">
+              Hand each jar to a different player. Don’t say the labels out loud — only describe the smells.
+            </div>
+          </div>
 
-      function clearTimer() {
-        if (timerIntervalId !== null) {
-          clearInterval(timerIntervalId);
-          timerIntervalId = null;
+          <div class="timer-block" aria-label="Round Timer">
+            <div>
+              <div class="timer-label">Countdown</div>
+              <div class="timer-display" id="timer-display">02:00</div>
+            </div>
+            <div class="timer-controls">
+              <button class="secondary" id="new-pair-btn" disabled>
+                🎲 New pair
+              </button>
+              <button class="ghost" id="reset-btn" disabled>
+                🔄 Reset
+              </button>
+              <button class="primary" id="start-btn" disabled>
+                ▶ Start 2 min
+              </button>
+            </div>
+          </div>
+
+          <div class="reveal-panel" id="reveal-panel">
+            <div class="reveal-heading" id="reveal-heading">Time is up!</div>
+            <div class="reveal-sub" id="reveal-sub">
+              Talk it out and agree on your final guess. When you’re ready, press “Reveal Answer”.
+            </div>
+
+            <button class="primary wide" id="reveal-answer-btn">
+              👀 Reveal Answer
+            </button>
+
+            <div class="answer-text" id="answer-text" style="display:none;">Answer: –</div>
+            <div class="answer-meta" id="answer-meta" style="display:none;"></div>
+
+            <div class="answer-actions" id="answer-actions" style="display:none;">
+              <button class="success" id="correct-btn">✅ We got it right</button>
+              <button class="danger" id="incorrect-btn">❌ We missed it</button>
+            </div>
+
+            <div class="note">
+              Scoring uses the honour system — be fair to yourselves (and each other). 😉
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Side rules card -->
+      <aside class="card card-side" aria-label="How to Play">
+        <div class="card-header-label">Rules</div>
+        <div class="side-panel-section">
+          <h3>How to Play</h3>
+          <div class="instructions">
+            <ol>
+              <li>Choose a <strong>category card</strong>.</li>
+              <li>The table shows two <strong>jar numbers</strong>.</li>
+              <li>Give each jar to a different player.</li>
+              <li>Start the <strong>2 minute timer</strong>.</li>
+              <li>Each player smells their jar and describes it. Together, guess what the two scents combine into.</li>
+              <li>When time is up, stop, agree on your guess, then press <strong>Reveal Answer</strong> and mark your score.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="side-panel-section">
+          <h3>Table Setup</h3>
+          <div class="badge">
+            ⏱ 2 minute rounds
+          </div>
+          <div class="pill-row">
+            <div class="tiny-pill">Shared screen</div>
+            <div class="tiny-pill">Honour scoring</div>
+            <div class="tiny-pill">Re-usable scents</div>
+          </div>
+          <div class="note">
+            Edit scent pairs &amp; jar numbers in the <code>gameData</code> object in the script below.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Game data (EDIT THIS PART)
+    // ----------------------------
+    const gameData = {
+      categories: [
+        {
+          id: 'locations',
+          name: 'Places / Locations',
+          description: 'Spaces you can stand in or move through.',
+          pairs: [
+            {
+              id: 'campfire',
+              answer: 'Campfire',
+              jars: [1, 2],
+              scentLabels: ['Smoke', 'Pine trees']
+            },
+            {
+              id: 'farm',
+              answer: 'Farm',
+              jars: [3, 4],
+              scentLabels: ['Hay', 'Manure']
+            }
+          ]
+        },
+        {
+          id: 'food-drink',
+          name: 'Food & Drinks',
+          description: 'Edible things and beverages.',
+          pairs: [
+            {
+              id: 'bakery',
+              answer: 'Bakery',
+              jars: [5, 6],
+              scentLabels: ['Caramel', 'Vanilla']
+            },
+            {
+              id: 'coffee-shop',
+              answer: 'Coffee Shop',
+              jars: [7, 8],
+              scentLabels: ['Coffee', 'Sweet pastry']
+            }
+          ]
+        },
+        {
+          id: 'things',
+          name: 'Objects / Things',
+          description: 'Everyday objects or scenes.',
+          pairs: [
+            {
+              id: 'christmas-tree',
+              answer: 'Christmas Tree',
+              jars: [9, 10],
+              scentLabels: ['Pine', 'Cinnamon / spices']
+            },
+            {
+              id: 'beach-day',
+              answer: 'Beach Day',
+              jars: [11, 12],
+              scentLabels: ['Salt water', 'Sunscreen / coconut']
+            }
+          ]
         }
-        timerRunning = false;
+      ],
+      roundDurationSeconds: 120
+    };
+
+    // ----------------------------
+    // State
+    // ----------------------------
+    let currentCategory = null;
+    let currentPair = null;
+    let timerSecondsRemaining = gameData.roundDurationSeconds;
+    let timerIntervalId = null;
+    let timerRunning = false;
+    let timerFinished = false;
+    let roundsPlayed = 0;
+    let roundsCorrect = 0;
+
+    // ----------------------------
+    // DOM Elements
+    // ----------------------------
+    const categoryButtonsContainer = document.getElementById('category-buttons');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const roundInfo = document.getElementById('round-info');
+    const roundCategoryLabel = document.getElementById('round-category-label');
+    const jarRow = document.getElementById('jar-row');
+    const timerDisplay = document.getElementById('timer-display');
+    const newPairBtn = document.getElementById('new-pair-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const startBtn = document.getElementById('start-btn');
+    const revealPanel = document.getElementById('reveal-panel');
+    const revealHeading = document.getElementById('reveal-heading');
+    const revealSub = document.getElementById('reveal-sub');
+    const revealAnswerBtn = document.getElementById('reveal-answer-btn');
+    const answerText = document.getElementById('answer-text');
+    const answerMeta = document.getElementById('answer-meta');
+    const answerActions = document.getElementById('answer-actions');
+    const correctBtn = document.getElementById('correct-btn');
+    const incorrectBtn = document.getElementById('incorrect-btn');
+    const roundsCountLabel = document.getElementById('rounds-count');
+    const correctCountLabel = document.getElementById('correct-count');
+
+    // ----------------------------
+    // Helpers
+    // ----------------------------
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function setTimer(seconds) {
+      timerSecondsRemaining = seconds;
+      timerDisplay.textContent = formatTime(timerSecondsRemaining);
+    }
+
+    function clearTimer() {
+      if (timerIntervalId !== null) {
+        clearInterval(timerIntervalId);
+        timerIntervalId = null;
       }
+      timerRunning = false;
+    }
 
-      function updateScoreboard() {
-        roundsCountLabel.textContent = roundsPlayed;
-        correctCountLabel.textContent = roundsCorrect;
+    function updateScoreboard() {
+      roundsCountLabel.textContent = roundsPlayed;
+      correctCountLabel.textContent = roundsCorrect;
+    }
+
+    function pickRandomPair(category) {
+      const pairs = category.pairs;
+      if (!pairs || pairs.length === 0) return null;
+      const idx = Math.floor(Math.random() * pairs.length);
+      return pairs[idx];
+    }
+
+    function updateStatus(text, live = false) {
+      statusText.textContent = text;
+      if (live) {
+        statusDot.classList.add('live');
+      } else {
+        statusDot.classList.remove('live');
       }
+    }
 
-      function pickRandomPair(category) {
-        const pairs = category.pairs;
-        if (!pairs || pairs.length === 0) return null;
-        const idx = Math.floor(Math.random() * pairs.length);
-        return pairs[idx];
+    function renderRoundInfo() {
+      if (!currentCategory || !currentPair) {
+        roundInfo.style.display = 'none';
+        return;
       }
-
-      function updateStatus(text, live = false) {
-        statusText.textContent = text;
-        if (live) {
-          statusDot.classList.add("live");
-        } else {
-          statusDot.classList.remove("live");
-        }
-      }
-
-      function renderRoundInfo() {
-        if (!currentCategory || !currentPair) {
-          roundInfo.style.display = "none";
-          return;
-        }
-        roundInfo.style.display = "flex";
-        roundCategoryLabel.textContent = `Category: ${currentCategory.name}`;
-        jarRow.innerHTML = "";
-        currentPair.jars.forEach((jarNum, index) => {
-          const pill = document.createElement("div");
-          pill.className = "jar-pill";
-          const labelSpan = document.createElement("span");
-          labelSpan.className = "label";
-          labelSpan.textContent = `Jar ${index + 1}`;
-          const valueSpan = document.createElement("span");
-          valueSpan.className = "value";
-          valueSpan.textContent = `#${jarNum}`;
-          pill.appendChild(labelSpan);
-          pill.appendChild(valueSpan);
-          jarRow.appendChild(pill);
-        });
-      }
-
-      function resetRound(hardResetCategory = false) {
-        clearTimer();
-        setTimer(gameData.roundDurationSeconds);
-        timerFinished = false;
-        revealPanel.style.display = "none";
-
-        if (hardResetCategory) {
-          currentCategory = null;
-          currentPair = null;
-          roundInfo.style.display = "none";
-          const buttons =
-            categoryButtonsContainer.querySelectorAll(".category-btn");
-          buttons.forEach((btn) => btn.classList.remove("active"));
-          updateStatus("Select a category to start a round.", false);
-          newPairBtn.disabled = true;
-          resetBtn.disabled = true;
-          startBtn.disabled = true;
-        } else {
-          // Keep currentCategory, but clear pair
-          currentPair = null;
-          roundInfo.style.display = "none";
-          if (currentCategory) {
-            updateStatus(
-              "Press “New Pair” to pick another combination in this category.",
-              false
-            );
-            newPairBtn.disabled = false;
-            resetBtn.disabled = false;
-            startBtn.disabled = true;
-          }
-        }
-      }
-
-      function startTimer() {
-        if (!currentPair || !currentCategory) return;
-        if (timerRunning) return;
-
-        timerRunning = true;
-        timerFinished = false;
-        revealPanel.style.display = "none";
-        updateStatus(
-          "Timer running — describe your scents and guess together!",
-          true
-        );
-
-        newPairBtn.disabled = true;
-        resetBtn.disabled = false;
-        startBtn.disabled = true;
-
-        timerIntervalId = setInterval(() => {
-          timerSecondsRemaining--;
-          timerDisplay.textContent = formatTime(timerSecondsRemaining);
-
-          if (timerSecondsRemaining <= 0) {
-            clearTimer();
-            timerFinished = true;
-            updateStatus(
-              "Time is up! Reveal the answer and mark your score.",
-              false
-            );
-            showRevealPanel();
-          }
-        }, 1000);
-      }
-
-      function showRevealPanel() {
-        if (!currentPair || !currentCategory) return;
-        revealPanel.style.display = "flex";
-        answerText.textContent = `Answer: ${currentPair.answer}`;
-        // Optional meta info: both jar numbers and scent labels (for after the round).
-        const labels =
-          currentPair.scentLabels && currentPair.scentLabels.length
-            ? currentPair.scentLabels
-                .map(
-                  (label, i) =>
-                    `Jar ${i + 1} (#${currentPair.jars[i]}): ${label}`
-                )
-                .join(" • ")
-            : `Jars: ${currentPair.jars
-                .map((n, i) => `Jar ${i + 1} #${n}`)
-                .join(" • ")}`;
-
-        answerMeta.textContent = labels;
-      }
-
-      // ----------------------------
-      // Event handlers
-      // ----------------------------
-      function handleCategoryClick(categoryId) {
-        const cat = gameData.categories.find((c) => c.id === categoryId);
-        if (!cat) return;
-
-        // Set active button
-        const buttons =
-          categoryButtonsContainer.querySelectorAll(".category-btn");
-        buttons.forEach((btn) => {
-          if (btn.dataset.categoryId === categoryId) {
-            btn.classList.add("active");
-          } else {
-            btn.classList.remove("active");
-          }
-        });
-
-        currentCategory = cat;
-        currentPair = pickRandomPair(cat);
-        setTimer(gameData.roundDurationSeconds);
-        revealPanel.style.display = "none";
-        timerFinished = false;
-        clearTimer();
-
-        renderRoundInfo();
-        newPairBtn.disabled = false;
-        resetBtn.disabled = false;
-        startBtn.disabled = false;
-
-        updateStatus(
-          `Playing in “${cat.name}”. Hand out the jars, then start the timer.`,
-          false
-        );
-      }
-
-      newPairBtn.addEventListener("click", () => {
-        if (!currentCategory) return;
-        clearTimer();
-        setTimer(gameData.roundDurationSeconds);
-        timerFinished = false;
-        revealPanel.style.display = "none";
-
-        currentPair = pickRandomPair(currentCategory);
-        renderRoundInfo();
-        newPairBtn.disabled = false;
-        resetBtn.disabled = false;
-        startBtn.disabled = false;
-
-        updateStatus(
-          "New pair selected. Hand out the jars, then start the timer.",
-          false
-        );
+      roundInfo.style.display = 'flex';
+      roundCategoryLabel.textContent = `Category: ${currentCategory.name}`;
+      jarRow.innerHTML = '';
+      currentPair.jars.forEach((jarNum, index) => {
+        const pill = document.createElement('div');
+        pill.className = 'jar-pill';
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.textContent = `Jar ${index + 1}`;
+        const valueSpan = document.createElement('span');
+        valueSpan.className = 'value';
+        valueSpan.textContent = `#${jarNum}`;
+        pill.appendChild(labelSpan);
+        pill.appendChild(valueSpan);
+        jarRow.appendChild(pill);
       });
+    }
 
-      resetBtn.addEventListener("click", () => {
-        resetRound(true);
-      });
+    function hideRevealPanel() {
+      revealPanel.style.display = 'none';
+      answerText.style.display = 'none';
+      answerMeta.style.display = 'none';
+      answerActions.style.display = 'none';
+      revealAnswerBtn.style.display = 'inline-flex';
+    }
 
-      startBtn.addEventListener("click", () => {
-        if (!currentPair || !currentCategory) return;
-        startTimer();
-      });
+    function resetRound(hardResetCategory = false) {
+      clearTimer();
+      setTimer(gameData.roundDurationSeconds);
+      timerFinished = false;
+      hideRevealPanel();
 
-      correctBtn.addEventListener("click", () => {
-        roundsPlayed++;
-        roundsCorrect++;
-        updateScoreboard();
-        updateStatus(
-          "Nice! Marked as correct. Choose another pair or switch category.",
-          false
-        );
-        // Soft reset: keep category, allow a new pair
-        resetRound(false);
-      });
-
-      incorrectBtn.addEventListener("click", () => {
-        roundsPlayed++;
-        updateScoreboard();
-        updateStatus(
-          "Marked as incorrect. Try another pair or switch category.",
-          false
-        );
-        resetRound(false);
-      });
-
-      // ----------------------------
-      // Initial render
-      // ----------------------------
-      function initCategories() {
-        gameData.categories.forEach((cat) => {
-          const btn = document.createElement("button");
-          btn.className = "category-btn";
-          btn.dataset.categoryId = cat.id;
-
-          const labelSpan = document.createElement("span");
-          labelSpan.className = "label";
-          labelSpan.textContent = cat.name;
-
-          const pillSpan = document.createElement("span");
-          pillSpan.className = "pill";
-          pillSpan.textContent = `${cat.pairs.length} pairs`;
-
-          btn.appendChild(labelSpan);
-          btn.appendChild(pillSpan);
-
-          btn.addEventListener("click", () => handleCategoryClick(cat.id));
-          categoryButtonsContainer.appendChild(btn);
-        });
-      }
-
-      function init() {
-        initCategories();
-        setTimer(gameData.roundDurationSeconds);
-        updateStatus("Select a category to start a round.", false);
+      if (hardResetCategory) {
+        currentCategory = null;
+        currentPair = null;
+        roundInfo.style.display = 'none';
+        const buttons = categoryButtonsContainer.querySelectorAll('.category-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        updateStatus('Select a category to start a round.', false);
         newPairBtn.disabled = true;
         resetBtn.disabled = true;
         startBtn.disabled = true;
-        updateScoreboard();
+      } else {
+        currentPair = null;
+        roundInfo.style.display = 'none';
+        if (currentCategory) {
+          updateStatus('Press “New pair” to pick another combination in this category.', false);
+          newPairBtn.disabled = false;
+          resetBtn.disabled = false;
+          startBtn.disabled = true;
+        }
       }
+    }
 
-      init();
-    </script>
-  </body>
+    function startTimer() {
+      if (!currentPair || !currentCategory) return;
+      if (timerRunning) return;
+
+      timerRunning = true;
+      timerFinished = false;
+      hideRevealPanel();
+      updateStatus('Timer running — describe your scents and guess together!', true);
+
+      newPairBtn.disabled = true;
+      resetBtn.disabled = false;
+      startBtn.disabled = true;
+
+      timerIntervalId = setInterval(() => {
+        timerSecondsRemaining--;
+        timerDisplay.textContent = formatTime(timerSecondsRemaining);
+
+        if (timerSecondsRemaining <= 0) {
+          clearTimer();
+          timerFinished = true;
+          timerSecondsRemaining = 0;
+          timerDisplay.textContent = formatTime(0);
+          updateStatus('Time is up! Stop smelling and lock in your guess, then reveal the answer.', false);
+          showRevealPrompt();
+        }
+      }, 1000);
+    }
+
+    function showRevealPrompt() {
+      if (!currentPair || !currentCategory) return;
+      revealPanel.style.display = 'flex';
+      revealHeading.textContent = 'Time is up!';
+      revealSub.textContent = 'Talk it out and agree on your final guess. When you’re ready, press “Reveal Answer”.';
+      answerText.style.display = 'none';
+      answerMeta.style.display = 'none';
+      answerActions.style.display = 'none';
+      revealAnswerBtn.style.display = 'inline-flex';
+    }
+
+    function revealAnswer() {
+      if (!currentPair || !currentCategory) return;
+
+      answerText.textContent = `Answer: ${currentPair.answer}`;
+
+      const labels = currentPair.scentLabels && currentPair.scentLabels.length
+        ? currentPair.scentLabels.map((label, i) =>
+            `Jar ${i + 1} (#${currentPair.jars[i]}): ${label}`
+          ).join(' • ')
+        : `Jars: ${currentPair.jars.map((n, i) => `Jar ${i + 1} #${n}`).join(' • ')}`;
+
+      answerMeta.textContent = labels;
+
+      revealHeading.textContent = 'Answer revealed';
+      revealSub.textContent = 'Now mark whether your guess was correct or not.';
+
+      answerText.style.display = 'block';
+      answerMeta.style.display = 'block';
+      answerActions.style.display = 'flex';
+      revealAnswerBtn.style.display = 'none';
+    }
+
+    // ----------------------------
+    // Event handlers
+    // ----------------------------
+    function handleCategoryClick(categoryId) {
+      const cat = gameData.categories.find(c => c.id === categoryId);
+      if (!cat) return;
+
+      const buttons = categoryButtonsContainer.querySelectorAll('.category-btn');
+      buttons.forEach(btn => {
+        if (btn.dataset.categoryId === categoryId) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      currentCategory = cat;
+      currentPair = pickRandomPair(cat);
+      setTimer(gameData.roundDurationSeconds);
+      timerFinished = false;
+      hideRevealPanel();
+      clearTimer();
+
+      renderRoundInfo();
+      newPairBtn.disabled = false;
+      resetBtn.disabled = false;
+      startBtn.disabled = false;
+
+      updateStatus(`Playing in “${cat.name}”. Hand out the jars, then start the timer.`, false);
+    }
+
+    newPairBtn.addEventListener('click', () => {
+      if (!currentCategory) return;
+      clearTimer();
+      setTimer(gameData.roundDurationSeconds);
+      timerFinished = false;
+      hideRevealPanel();
+
+      currentPair = pickRandomPair(currentCategory);
+      renderRoundInfo();
+      newPairBtn.disabled = false;
+      resetBtn.disabled = false;
+      startBtn.disabled = false;
+
+      updateStatus('New pair selected. Hand out the jars, then start the timer.', false);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      resetRound(true);
+    });
+
+    startBtn.addEventListener('click', () => {
+      if (!currentPair || !currentCategory) return;
+      startTimer();
+    });
+
+    revealAnswerBtn.addEventListener('click', () => {
+      revealAnswer();
+    });
+
+    correctBtn.addEventListener('click', () => {
+      roundsPlayed++;
+      roundsCorrect++;
+      updateScoreboard();
+      updateStatus('Nice! Marked as correct. Choose another pair or switch category.', false);
+      resetRound(false);
+    });
+
+    incorrectBtn.addEventListener('click', () => {
+      roundsPlayed++;
+      updateScoreboard();
+      updateStatus('Marked as incorrect. Try another pair or switch category.', false);
+      resetRound(false);
+    });
+
+    // ----------------------------
+    // Initial render
+    // ----------------------------
+    function initCategories() {
+      gameData.categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'category-btn';
+        btn.dataset.categoryId = cat.id;
+
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'label';
+        labelSpan.textContent = cat.name;
+
+        const pillSpan = document.createElement('span');
+        pillSpan.className = 'pill';
+        pillSpan.textContent = `${cat.pairs.length} pairs`;
+
+        btn.appendChild(labelSpan);
+        btn.appendChild(pillSpan);
+
+        btn.addEventListener('click', () => handleCategoryClick(cat.id));
+        categoryButtonsContainer.appendChild(btn);
+      });
+    }
+
+    function init() {
+      initCategories();
+      setTimer(gameData.roundDurationSeconds);
+      updateStatus('Select a category to start a round.', false);
+      newPairBtn.disabled = true;
+      resetBtn.disabled = true;
+      startBtn.disabled = true;
+      hideRevealPanel();
+      updateScoreboard();
+    }
+
+    init();
+  </script>
+</body>
 </html>
