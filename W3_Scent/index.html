@@ -689,72 +689,73 @@
     </div>
   </div>
 
-  <script>
-    // ----------------------------
-    // Game data (EDIT THIS PART)
-    // ----------------------------
-    const gameData = {
-      categories: [
-        {
-          id: 'locations',
-          name: 'Places / Locations',
-          description: 'Spaces you can stand in or move through.',
-          pairs: [
-            {
-              id: 'campfire',
-              answer: 'Campfire',
-              jars: [1, 2],
-              scentLabels: ['Smoke', 'Pine trees']
-            },
-            {
-              id: 'farm',
-              answer: 'Farm',
-              jars: [3, 4],
-              scentLabels: ['Hay', 'Manure']
-            }
-          ]
-        },
-        {
-          id: 'food-drink',
-          name: 'Food & Drinks',
-          description: 'Edible things and beverages.',
-          pairs: [
-            {
-              id: 'bakery',
-              answer: 'Bakery',
-              jars: [5, 6],
-              scentLabels: ['Caramel', 'Vanilla']
-            },
-            {
-              id: 'coffee-shop',
-              answer: 'Coffee Shop',
-              jars: [7, 8],
-              scentLabels: ['Coffee', 'Sweet pastry']
-            }
-          ]
-        },
-        {
-          id: 'things',
-          name: 'Objects / Things',
-          description: 'Everyday objects or scenes.',
-          pairs: [
-            {
-              id: 'christmas-tree',
-              answer: 'Christmas Tree',
-              jars: [9, 10],
-              scentLabels: ['Pine', 'Cinnamon / spices']
-            },
-            {
-              id: 'beach-day',
-              answer: 'Beach Day',
-              jars: [11, 12],
-              scentLabels: ['Salt water', 'Sunscreen / coconut']
-            }
-          ]
-        }
-      ],
-      roundDurationSeconds: 120
-    };
+    <script>
+      // ----------------------------
+      // Game data (EDIT THIS PART)
+      // ----------------------------
+      // Replace these with your real scent pairs and jar numbers.
+      const gameData = {
+        categories: [
+          {
+            id: "locations",
+            name: "Places / Locations",
+            description: "Spaces you can stand in or move through.",
+            pairs: [
+              {
+                id: "campfire",
+                answer: "Campfire",
+                jars: [1, 2], // Jar numbers on your physical jars
+                scentLabels: ["Smoke", "Pine trees"],
+              },
+              {
+                id: "farm",
+                answer: "Farm",
+                jars: [3, 4],
+                scentLabels: ["Hay", "Manure"],
+              },
+            ],
+          },
+          {
+            id: "food-drink",
+            name: "Food & Drinks",
+            description: "Edible things and beverages.",
+            pairs: [
+              {
+                id: "bakery",
+                answer: "Bakery",
+                jars: [5, 6],
+                scentLabels: ["Caramel", "Vanilla"],
+              },
+              {
+                id: "coffee-shop",
+                answer: "Coffee Shop",
+                jars: [7, 8],
+                scentLabels: ["Coffee", "Sweet pastry"],
+              },
+            ],
+          },
+          {
+            id: "things",
+            name: "Objects / Things",
+            description: "Everyday objects or scenes.",
+            pairs: [
+              {
+                id: "christmas-tree",
+                answer: "Christmas Tree",
+                jars: [9, 10],
+                scentLabels: ["Pine", "Cinnamon / spices"],
+              },
+              {
+                id: "beach-day",
+                answer: "Beach Day",
+                jars: [11, 12],
+                scentLabels: ["Salt water", "Sunscreen / coconut"],
+              },
+            ],
+          },
+        ],
+        roundDurationSeconds: 120,
+      };
 
     // ----------------------------
     // State
