@@ -1,124 +1,91 @@
 // Extracted from index.html <script> block
 // ----------------------------
-// Game data (EDIT THIS PART)
+// Game data loader (from CSV files)
 // ----------------------------
-const gameData = {
-	categories: [
-		{
-			id: 'locations',
-			name: 'Places / Buildings',
-			description: 'Spaces you can stand in or move through.',
-			pairs: [
+// Game data will be loaded from `data/categories.csv` and `data/pairs.csv`.
+// categories.csv: id,name,description
+// pairs.csv: category_id,pair_id,answer,jars,scentLabels
+
+let gameData = null; // populated async
+
+async function fetchText(path) {
+	const res = await fetch(path);
+	if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
+	return await res.text();
+}
+
+function parseCsvSimple(text) {
+	const lines = text.trim().split(/\r?\n/).filter(Boolean);
+	if (lines.length === 0) return [];
+	const headers = lines.shift().split(',').map(h => h.trim());
+	return lines.map(line => {
+		const cols = line.split(',').map(c => c.trim());
+		const obj = {};
+		headers.forEach((h, i) => { obj[h] = cols[i] ?? ''; });
+		return obj;
+	});
+}
+
+function buildGameDataFromCsvTexts(categoriesText, pairsText) {
+	const cats = parseCsvSimple(categoriesText);
+	const pairs = parseCsvSimple(pairsText);
+	const categories = cats.map(c => {
+		const catPairs = pairs
+			.filter(p => p.category_id === c.id)
+			.map(p => ({
+				id: p.pair_id,
+				answer: p.answer,
+				jars: p.jars ? p.jars.split('|').map(n => Number(n.trim())) : [],
+				scentLabels: p.scentLabels ? p.scentLabels.split('|').map(s => s.trim()) : []
+			}));
+		return {
+			id: c.id,
+			name: c.name,
+			description: c.description,
+			pairs: catPairs
+		};
+	});
+	return { categories, roundDurationSeconds: 120 };
+}
+
+async function loadGameDataFromCsv() {
+	const [catsText, pairsText] = await Promise.all([
+		fetchText('data/categories.csv'),
+		fetchText('data/pairs.csv')
+	]);
+	gameData = buildGameDataFromCsvTexts(catsText, pairsText);
+}
+
+// Initialize app with CSV-backed gameData. If loading fails, fall back to embedded data.
+async function initData() {
+	try {
+		await loadGameDataFromCsv();
+		console.log('Loaded gameData from CSV files.');
+	} catch (err) {
+		console.warn('Could not load CSV data, falling back to embedded gameData.', err);
+		// Fallback: small embedded dataset so the app still runs without server
+		gameData = {
+			categories: [
 				{
-					id: 'bakery',
-					answer: 'Bakery',
-					jars: [2, 3],
-					scentLabels: ['Caramel', 'Vanilla']
-				},
-				{
-					id: 'farm',
-					answer: 'Farm',
-					jars: [4, 5],
-					scentLabels: ['Hay', 'Beeswax']
-				},
-				{
-					id: 'italian-restaurant',
-					answer: 'Italian Restaurant',
-					jars: [6, 7],
-					scentLabels: ['Garlic', 'Thyme']
-				},
-				{
-					id: 'christmas-market',
-					answer: 'Christmas Market',
-					jars: [8, 9],
-					scentLabels: ['Cinnamon', 'Peppermint']
-				},
-				{
-					id: 'library',
-					answer: 'Library',
-					jars: [17, 20],
-					scentLabels: ['Trees/Wood', 'Leather']
+					id: 'fallback',
+					name: 'Fallback',
+					description: 'Default fallback category',
+					pairs: [
+						{ id: 'fallback-1', answer: 'Sample', jars: [1,2], scentLabels: ['One','Two'] }
+					]
 				}
-			]
-		},
-		{
-			id: 'food-drink',
-			name: 'Food & Drinks',
-			description: 'Edible things and beverages.',
-			pairs: [
-				{
-					id: 'pina-colada',
-					answer: 'Pina Colada',
-					jars: [10, 11],
-					scentLabels: ['Coconut', 'Pineapple']
-				},
-				{
-					id: 'candy-cane',
-					answer: 'Candy Cane',
-					jars: [9, 3],
-					scentLabels: ['Peppermint', 'Vanilla']
-				},
-				{
-					id: 'soup',
-					answer: 'Soup',
-					jars: [12, 13],
-					scentLabels: ['Carrot', 'Celery']
-				},
-				{
-					id: 'bbq',
-					answer: 'BBQ',
-					jars: [6, 14],
-					scentLabels: ['Garlic', 'Chili']
-				},
-				{
-					id: 'cinnamon-bun',
-					answer: 'Cinnamon Bun',
-					jars: [8, 2],
-					scentLabels: ['Cinnamon', 'Caramel']
-				}
-			]
-		},
-		{
-			id: 'things',
-			name: 'Objects / Things',
-			description: 'Everyday objects or scenes.',
-			pairs: [
-				{
-					id: 'swimming-pool',
-					answer: 'Swimming Pool',
-					jars: [15, 16],
-					scentLabels: ['Fresh Water', 'Chlorine']
-				},
-				{
-					id: 'campfire',
-					answer: 'Campfire',
-					jars: [1, 17],
-					scentLabels: ['Burnt Wood', 'Trees/Wood']
-				},
-				{
-					id: 'dish-soap',
-					answer: 'Dish Soap',
-					jars: [18, 19],
-					scentLabels: ['Lavender', 'Lemon']
-				},
-				{
-					id: 'house-cleaner',
-					answer: 'House Cleaner',
-					jars: [16, 19],
-					scentLabels: ['Chlorine', 'Lemon']
-				}
-			]
-		}
-	],
-	roundDurationSeconds: 120
-};
+			],
+			roundDurationSeconds: 120
+		};
+	}
+}
 
 // ----------------------------
 // State
 // ----------------------------
 let currentCategory = null;
 let currentPair = null;
-let timerSecondsRemaining = gameData.roundDurationSeconds;
+let timerSecondsRemaining = 0; // set after data is loaded
 let timerIntervalId = null;
 let timerRunning = false;
 let timerFinished = false;
@@ -127,6 +94,8 @@ let roundsCorrect = 0;
 
 let players = [];
 let currentRoundPlayers = [];
+// Track pair ids that have been used (correct or incorrect) so they won't show again
+const usedPairIds = new Set();
 
 // ----------------------------
 // DOM Elements
@@ -201,10 +170,10 @@ function updateScoreboard() {
 }
 
 function pickRandomPair(category) {
-	const pairs = category.pairs;
-	if (!pairs || pairs.length === 0) return null;
-	const idx = Math.floor(Math.random() * pairs.length);
-	return pairs[idx];
+	const available = (category.pairs || []).filter(p => !usedPairIds.has(p.id));
+	if (!available || available.length === 0) return null;
+	const idx = Math.floor(Math.random() * available.length);
+	return available[idx];
 }
 
 function updateStatus(text, live = false) {
@@ -398,6 +367,12 @@ function handleCategoryClick(categoryId) {
 		categoryDescriptionEl.style.display = 'block';
 	}
 	currentPair = pickRandomPair(cat);
+	if (!currentPair) {
+		updateStatus('No remaining pairs in this category.', false);
+		newPairBtn.disabled = true;
+		startBtn.disabled = true;
+		return;
+	}
 	pickPlayersForRound();
 	setTimer(gameData.roundDurationSeconds);
 	timerFinished = false;
@@ -419,8 +394,13 @@ newPairBtn.addEventListener('click', () => {
 	setTimer(gameData.roundDurationSeconds);
 	timerFinished = false;
 	hideRevealPanel();
-
 	currentPair = pickRandomPair(currentCategory);
+	if (!currentPair) {
+		updateStatus('No remaining pairs in this category. Choose another category.', false);
+		newPairBtn.disabled = true;
+		startBtn.disabled = true;
+		return;
+	}
 	pickPlayersForRound();
 	renderRoundInfo();
 	newPairBtn.disabled = false;
@@ -453,6 +433,17 @@ revealAnswerBtn.addEventListener('click', () => {
 });
 
 correctBtn.addEventListener('click', () => {
+	if (currentPair && currentPair.id) {
+		usedPairIds.add(currentPair.id);
+		// update the category button pill count
+		const btn = categoryButtonsContainer.querySelector(`.category-btn[data-category-id="${currentCategory.id}"]`);
+		if (btn) {
+			const remaining = (currentCategory.pairs || []).filter(p => !usedPairIds.has(p.id)).length;
+			const pill = btn.querySelector('.pill');
+			if (pill) pill.textContent = `${remaining} pairs`;
+			btn.disabled = remaining === 0;
+		}
+	}
 	roundsPlayed++;
 	roundsCorrect++;
 	updateScoreboard();
@@ -461,6 +452,17 @@ correctBtn.addEventListener('click', () => {
 });
 
 incorrectBtn.addEventListener('click', () => {
+	if (currentPair && currentPair.id) {
+		usedPairIds.add(currentPair.id);
+		// update the category button pill count
+		const btn = categoryButtonsContainer.querySelector(`.category-btn[data-category-id="${currentCategory.id}"]`);
+		if (btn) {
+			const remaining = (currentCategory.pairs || []).filter(p => !usedPairIds.has(p.id)).length;
+			const pill = btn.querySelector('.pill');
+			if (pill) pill.textContent = `${remaining} pairs`;
+			btn.disabled = remaining === 0;
+		}
+	}
 	roundsPlayed++;
 	updateScoreboard();
 	updateStatus('Marked as incorrect. Try another pair or switch category.', false);
@@ -526,6 +528,7 @@ startGameBtn.addEventListener('click', () => {
 // Initial render
 // ----------------------------
 function initCategories() {
+	// Build category buttons and show remaining (unused) pairs count
 	gameData.categories.forEach(cat => {
 		const btn = document.createElement('button');
 		btn.className = 'category-btn';
@@ -537,17 +540,21 @@ function initCategories() {
 
 		const pillSpan = document.createElement('span');
 		pillSpan.className = 'pill';
-		pillSpan.textContent = `${cat.pairs.length} pairs`;
+		const remaining = (cat.pairs || []).filter(p => !usedPairIds.has(p.id)).length;
+		pillSpan.textContent = `${remaining} pairs`;
 
 		btn.appendChild(labelSpan);
 		btn.appendChild(pillSpan);
+
+		btn.disabled = remaining === 0;
 
 		btn.addEventListener('click', () => handleCategoryClick(cat.id));
 		categoryButtonsContainer.appendChild(btn);
 	});
 }
 
-function init() {
+async function init() {
+	await initData();
 	initCategories();
 	setTimer(gameData.roundDurationSeconds);
 	updateStatus('Add players to begin.', false);

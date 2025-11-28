@@ -1,0 +1,15 @@
+category_id,pair_id,answer,jars,scentLabels
+locations,bakery,Bakery,2|3,Caramel|Vanilla
+locations,farm,Farm,4|5,Hay|Beeswax
+locations,italian-restaurant,Italian Restaurant,6|7,Garlic|Thyme
+locations,christmas-market,Christmas Market,8|9,Cinnamon|Peppermint
+locations,library,Library,17|20,Trees/Wood|Leather
+food-drink,pina-colada,Pina Colada,10|11,Coconut|Pineapple
+food-drink,candy-cane,Candy Cane,9|3,Peppermint|Vanilla
+food-drink,soup,Soup,12|13,Carrot|Celery
+food-drink,bbq,BBQ,6|14,Garlic|Chili
+food-drink,cinnamon-bun,Cinnamon Bun,8|2,Cinnamon|Caramel
+things,swimming-pool,Swimming Pool,15|16,Fresh Water|Chlorine
+things,campfire,Campfire,1|17,Burnt Wood|Trees/Wood
+things,dish-soap,Dish Soap,18|19,Lavender|Lemon
+things,house-cleaner,House Cleaner,16|19,Chlorine|Lemon
