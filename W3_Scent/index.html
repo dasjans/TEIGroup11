@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Scent Heads Up – Tabletop</title>
+  <title>Noses Up! – Tabletop</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Optional fun font -->
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet">
@@ -725,7 +725,7 @@
     <div class="table-title">
       <div class="table-title-icon">👃</div>
       <div class="table-title-text">
-        <div class="main">Scent Heads Up</div>
+        <div class="main">Noses Up!</div>
         <div class="sub">Tabletop Edition</div>
       </div>
     </div>
@@ -792,6 +792,9 @@
               <button class="ghost" id="reset-btn" disabled>
                 🔄 Reset
               </button>
+              <button class="ghost" id="stop-early-btn" disabled>
+                ⏹ Stop early
+              </button>
               <button class="primary" id="start-btn" disabled>
                 ▶ Start 2 min
               </button>
@@ -841,8 +844,8 @@
                 <li>The table shows two <strong>jar numbers</strong>.</li>
                 <li>Give each jar to a different player.</li>
                 <li>Start the <strong>2 minute timer</strong>.</li>
-                <li>Each player smells their jar and describes it. Together, guess what the two scents combine into.</li>
-                <li>When time is up, stop, agree on your guess, then press <strong>Reveal Answer</strong> and mark your score.</li>
+                <li>If you agree on a guess before time is up, press <strong>Stop early</strong> to end the round.</li>
+                <li>When time is up or you’ve stopped early, stop, agree on your guess, then press <strong>Reveal Answer</strong> and mark your score.</li>
               </ol>
             </div>
           </div>
@@ -912,20 +915,38 @@
       categories: [
         {
           id: 'locations',
-          name: 'Places / Locations',
+          name: 'Places / Buildings',
           description: 'Spaces you can stand in or move through.',
           pairs: [
-            {
-              id: 'campfire',
-              answer: 'Campfire',
-              jars: [1, 2],
-              scentLabels: ['Smoke', 'Pine trees']
+          {
+              id: 'bakery',
+              answer: 'Bakery',
+              jars: [2, 3],
+              scentLabels: ['Caramel', 'Vanilla']
             },
             {
               id: 'farm',
               answer: 'Farm',
-              jars: [3, 4],
-              scentLabels: ['Hay', 'Manure']
+              jars: [4, 5],
+              scentLabels: ['Hay', 'Beeswax']
+            },
+            {
+              id: 'italian-restaurant',
+              answer: 'Italian Restaurant',
+              jars: [6, 7],
+              scentLabels: ['Garlic', 'Thyme']
+            },
+            {
+              id: 'christmas-market',
+              answer: 'Christmas Market',
+              jars: [8, 9],
+              scentLabels: ['Cinnamon', 'Peppermint']
+            },
+            {
+              id: 'library',
+              answer: 'Library',
+              jars: [17, 20],
+              scentLabels: ['Trees/Wood', 'Leather']
             }
           ]
         },
@@ -935,16 +956,34 @@
           description: 'Edible things and beverages.',
           pairs: [
             {
-              id: 'bakery',
-              answer: 'Bakery',
-              jars: [5, 6],
-              scentLabels: ['Caramel', 'Vanilla']
+              id: 'pina-colada',
+              answer: 'Pina Colada',
+              jars: [10, 11],
+              scentLabels: ['Coconut', 'Pineapple']
             },
             {
-              id: 'coffee-shop',
-              answer: 'Coffee Shop',
-              jars: [7, 8],
-              scentLabels: ['Coffee', 'Sweet pastry']
+              id: 'candy-cane',
+              answer: 'Candy Cane',
+              jars: [9, 3],
+              scentLabels: ['Peppermint', 'Vanilla']
+            },
+            {
+              id: 'soup',
+              answer: 'Soup',
+              jars: [12, 13],
+              scentLabels: ['Carrot', 'Celery']
+            },
+            {
+              id: 'bbq',
+              answer: 'BBQ',
+              jars: [6, 14],
+              scentLabels: ['Garlic', 'Chili']
+            },
+            {
+              id: 'cinnamon-bun',
+              answer: 'Cinnamon Bun',
+              jars: [8, 2],
+              scentLabels: ['Cinnamon', 'Caramel']
             }
           ]
         },
@@ -954,16 +993,28 @@
           description: 'Everyday objects or scenes.',
           pairs: [
             {
-              id: 'christmas-tree',
-              answer: 'Christmas Tree',
-              jars: [9, 10],
-              scentLabels: ['Pine', 'Cinnamon / spices']
+              id: 'swimming-pool',
+              answer: 'Swimming Pool',
+              jars: [15, 16],
+              scentLabels: ['Fresh Water', 'Chlorine']
             },
             {
-              id: 'beach-day',
-              answer: 'Beach Day',
-              jars: [11, 12],
-              scentLabels: ['Salt water', 'Sunscreen / coconut']
+              id: 'campfire',
+              answer: 'Campfire',
+              jars: [1, 17],
+              scentLabels: ['Burnt Wood', 'Trees/Wood']
+            },
+            {
+              id: 'dish-soap',
+              answer: 'Dish Soap',
+              jars: [18, 19],
+              scentLabels: ['Lavender', 'Lemon']
+            },
+            {
+              id: 'house-cleaner',
+              answer: 'House Cleaner',
+              jars: [16, 19],
+              scentLabels: ['Chlorine', 'Lemon']
             }
           ]
         }
@@ -999,6 +1050,7 @@
     const newPairBtn = document.getElementById('new-pair-btn');
     const resetBtn = document.getElementById('reset-btn');
     const startBtn = document.getElementById('start-btn');
+    const stopEarlyBtn = document.getElementById('stop-early-btn');
     const revealPanel = document.getElementById('reveal-panel');
     const revealHeading = document.getElementById('reveal-heading');
     const revealSub = document.getElementById('reveal-sub');
@@ -1046,6 +1098,7 @@
         timerIntervalId = null;
       }
       timerRunning = false;
+      if (stopEarlyBtn) stopEarlyBtn.disabled = true;
     }
 
     function updateScoreboard() {
@@ -1141,6 +1194,7 @@
       newPairBtn.disabled = true;
       resetBtn.disabled = false;
       startBtn.disabled = true;
+      stopEarlyBtn.disabled = false;
 
       timerIntervalId = setInterval(() => {
         timerSecondsRemaining--;
@@ -1152,16 +1206,23 @@
           timerSecondsRemaining = 0;
           timerDisplay.textContent = formatTime(0);
           updateStatus('Time is up! Stop smelling and lock in your guess, then reveal the answer.', false);
-          showRevealPrompt();
+          showRevealPrompt('time');
         }
       }, 1000);
     }
 
-    function showRevealPrompt() {
+    function showRevealPrompt(reason = 'time') {
       if (!currentPair || !currentCategory) return;
       revealPanel.style.display = 'flex';
-      revealHeading.textContent = 'Time is up!';
-      revealSub.textContent = 'Talk it out and agree on your final guess. When you’re ready, press “Reveal Answer”.';
+
+      if (reason === 'early') {
+        revealHeading.textContent = 'Round stopped';
+        revealSub.textContent = 'You chose to stop early. Lock in your guess, then press “Reveal Answer”.';
+      } else {
+        revealHeading.textContent = 'Time is up!';
+        revealSub.textContent = 'Talk it out and agree on your final guess. When you’re ready, press “Reveal Answer”.';
+      }
+
       answerText.style.display = 'none';
       answerMeta.style.display = 'none';
       answerActions.style.display = 'none';
@@ -1245,6 +1306,7 @@
       newPairBtn.disabled = false;
       resetBtn.disabled = false;
       startBtn.disabled = false;
+      stopEarlyBtn.disabled = true;
 
       updateStatus(`Playing in “${cat.name}”. Hand out the jars to ${currentRoundPlayers[0]} and ${currentRoundPlayers[1]}, then start the timer.`, false);
     }
@@ -1262,6 +1324,7 @@
       newPairBtn.disabled = false;
       resetBtn.disabled = false;
       startBtn.disabled = false;
+      stopEarlyBtn.disabled = true;
 
       updateStatus(`New pair selected. Jars go to ${currentRoundPlayers[0]} and ${currentRoundPlayers[1]}. Hand them out, then start the timer.`, false);
     });
@@ -1273,6 +1336,14 @@
     startBtn.addEventListener('click', () => {
       if (!currentPair || !currentCategory) return;
       startTimer();
+    });
+
+    stopEarlyBtn.addEventListener('click', () => {
+      if (!timerRunning || !currentPair || !currentCategory) return;
+      clearTimer();
+      timerFinished = true;
+      updateStatus('Round stopped early. Lock in your guess, then reveal the answer.', false);
+      showRevealPrompt('early');
     });
 
     revealAnswerBtn.addEventListener('click', () => {
@@ -1381,6 +1452,7 @@
       newPairBtn.disabled = true;
       resetBtn.disabled = true;
       startBtn.disabled = true;
+      stopEarlyBtn.disabled = true;
       hideRevealPanel();
       updateScoreboard();
     }
